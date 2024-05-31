@@ -196,6 +196,7 @@
 
         let currentQuestionIndex = 0;
         let score = 0;
+        let userName = "";
 
         const questionElement = document.getElementById("question");
         const answerButtons = document.querySelectorAll(".answer-btn");
@@ -203,6 +204,12 @@
         const feedbackElement = document.getElementById("feedback");
 
         function startQuiz() {
+            const userNameInput = prompt("Please enter your name:");
+            if (userNameInput) {
+                userName = userNameInput;
+            } else {
+                userName = "Guest";
+            }
             currentQuestionIndex = 0;
             score = 0;
             nextButton.style.display = "none";
@@ -228,7 +235,7 @@
         timeLeftElement.style.fontWeight = 'bold';
 
         function startTimer() {
-            let timeLeft = 30;
+            let timeLeft = 20;
             questionElement.appendChild(document.createElement('br'));
             questionElement.appendChild(document.createTextNode("Time Left: "));
             questionElement.appendChild(timeLeftElement);
@@ -295,7 +302,7 @@
                 button.style.display = "none";
             });
             questionElement.innerHTML = `<h1>Thank you for completing the quiz!</h1>`;
-            feedbackElement.innerText = `You scored ${score} out of ${quizData.length}!`;
+            feedbackElement.innerText = ` ${userName} scored ${score} out of ${quizData.length}!`;
             nextButton.innerText = "Restart";
             nextButton.style.display = "block";
             nextButton.onclick = startQuiz;
