@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario Quiz Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fbe3e8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        #question {
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            display: block;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .answer-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #next-btn {
+            background-color: #00CED1;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: none;
+        }
+
+        #next-btn:hover {
+            background-color: #00FFFF;
+        }
+
+        #feedback {
+            margin-top: 20px;
+        }
+
+        .correct {
+            background-color: #28a745 !important;
+        }
+
+        .wrong {
+            background-color: #dc3545 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="quiz-container">
+            <h2 id="question"></h2>
+            <div id="answers">
+                <button class="answer-btn" onclick="selectAnswer(0)"></button>
+                <button class="answer-btn" onclick="selectAnswer(1)"></button>
+                <button class="answer-btn" onclick="selectAnswer(2)"></button>
+                <button class="answer-btn" onclick="selectAnswer(3)"></button>
+            </div>
+            <button id="next-btn" onclick="nextQuestion()">Next</button>
+            <div id="feedback"></div>
+        </div>
+    </div>
+    <script>
+        const quizData = [
+            {
+                question: "Scenario 1: You're in a crowded mall and notice a person collapse. What should you do?",
+                answers: [
+                    "Ignore and continue shopping.",
+                    "Immediately call emergency services and provide assistance if trained.",
+                    "Ask someone else to handle the situation.",
+                    "Take a picture for social media before helping."
+                ],
+                correct: 1
+            },
+            {
+                question: "Scenario 2: While hiking, you encounter a bear. What's the best course of action?",
+                answers: [
+                    "Run away as fast as possible.",
+                    "Make loud noises and wave your arms to scare it away.",
+                    "Play dead and wait for it to leave.",
+                    "Slowly back away while maintaining eye contact."
+                ],
+                correct: 3
+            },
+            {
+                question: "Scenario 3: You witness a car accident. What should you do first?",
+                answers: [
+                    "Leave the scene and call the police later.",
+                    "Check for injuries and call emergency services.",
+                    "Start recording the accident for evidence.",
+                    "Move the vehicles out of the road immediately."
+                ],
+                correct: 1
+            },
+            {
+                question: "Scenario 4: You suspect someone is having a heart attack. What's the initial step?",
+                answers: [
+                    "Give them water to drink.",
+                    "Encourage them to walk around.",
+                    "Call emergency services and stay with the person.",
+                    "Offer them food to see if it helps."
+                ],
+                correct: 2
+            },
+            {
+                question: "Scenario 5: You notice a fire in a public building. What's the first thing you should do?",
+                answers: [
+                    "Attempt to extinguish the fire on your own.",
+                    "Evacuate the building and call the fire department.",
+                    "Stay where you are and wait for instructions.",
+                    "Take pictures of the fire to post on social media."
+                ],
+                correct: 1
+            },
+            {
+                question: "Scenario 6: You encounter someone experiencing a severe allergic reaction. What's the immediate action?",
+                answers: [
+                    "Wait to see if the reaction improves on its own.",
+                    "Offer them food or drink.",
+                    "Administer an epinephrine auto-injector if available.",
+                    "Ignore the situation as it's not your concern."
+                ],
+                correct: 2
+            },
+            {
+                question: "Scenario 7: You find a lost child wandering alone. What's the appropriate action?",
+                answers: [
+                    "Leave the child and continue with your plans.",
+                    "Take the child with you to find their parents.",
+                    "Call the police and leave the area.",
+                    "Ask the child to find their own way home."
+                ],
+                correct: 1
+            },
+            {
+                question: "Scenario 8: You encounter a person being harassed in public. What should you do?",
+                answers: [
+                    "Join in and participate in the harassment.",
+                    "Intervene and offer assistance to the person being harassed.",
+                    "Record the incident without intervening.",
+                    "Ignore the situation and walk away."
+                ],
+                correct: 1
+            },
+            {
+                question: "Scenario 9: You witness a hit-and-run accident. What's the first step?",
+                answers: [
+                    "Chase after the fleeing vehicle to get its license plate.",
+                    "Check on the victim and call emergency services.",
+                    "Ignore the incident and continue with your day.",
+                    "Confront the driver of the fleeing vehicle."
+                ],
+                correct: 1
+            },
+            {
+                question: "Scenario 10: You encounter a stranger in distress asking for help. What should you do?",
+                answers: [
+                    "Ignore them and continue walking.",
+                    "Assess the situation and offer appropriate assistance.",
+                    "Tell them to find help elsewhere.",
+                    "Pretend not to notice and walk away quickly."
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const questionElement = document.getElementById("question");
+        const answerButtons = document.querySelectorAll(".answer-btn");
+        const nextButton = document.getElementById("next-btn");
+        const feedbackElement = document.getElementById("feedback");
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            nextButton.style.display = "none";
+            nextButton.innerText = "Next";
+            nextButton.onclick = nextQuestion;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionElement.innerText = currentQuestion.question;
+            answerButtons.forEach((button, index) => {
+                button.innerText = currentQuestion.answers[index];
+                button.dataset.correct = index == currentQuestion.correct;
+                button.style.display = "block";
+            });
+            startTimer();
+        }
+
+        let timerInterval;
+        let timeLeftElement = document.createElement('span');
+        timeLeftElement.style.fontWeight = 'bold';
+
+        function startTimer() {
+            let timeLeft = 30;
+            questionElement.appendChild(document.createElement('br'));
+            questionElement.appendChild(document.createTextNode("Time Left: "));
+            questionElement.appendChild(timeLeftElement);
+            timeLeftElement.innerText = timeLeft;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timeLeftElement.innerText = timeLeft;
+                if (timeLeft === 0) {
+                    clearInterval(timerInterval);
+                    nextQuestion(); // Automatically move to the next question when time runs out
+                }
+            }, 1000);
+        }
+
+        function resetState() {
+            feedbackElement.innerText = "";
+            nextButton.style.display = "none";
+            answerButtons.forEach(button => {
+                button.disabled = false;
+                button.classList.remove("correct", "wrong");
+            });
+            if (timeLeftElement) {
+                timeLeftElement.remove();
+            }
+            clearInterval(timerInterval);
+        }
+
+        function selectAnswer(index) {
+            const selectedButton = answerButtons[index];
+            const correct = selectedButton.dataset.correct === "true";
+            if (correct) {
+                score++;
+                feedbackElement.innerText = "Correct!";
+                selectedButton.classList.add("correct");
+            } else {
+                feedbackElement.innerText = "Wrong!";
+                selectedButton.classList.add("wrong");
+                // Show the correct answer in green
+                answerButtons.forEach(button => {
+                    if (button.dataset.correct === "true") {
+                        button.classList.add("correct");
+                    }
+                });
+            }
+            answerButtons.forEach(button => {
+                button.disabled = true;
+            });
+            nextButton.style.display = "block";
+            clearInterval(timerInterval);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                showQuestion();
+            } else {
+                showScore();
+            }
+        }
+
+        function showScore() {
+            resetState();
+            answerButtons.forEach(button => {
+                button.style.display = "none";
+            });
+            questionElement.innerHTML = `<h1>Thank you for completing the quiz!</h1>`;
+            feedbackElement.innerText = `You scored ${score} out of ${quizData.length}!`;
+            nextButton.innerText = "Restart";
+            nextButton.style.display = "block";
+            nextButton.onclick = startQuiz;
+        }
+
+        startQuiz();
+    </script>
+</body>
+</html>
