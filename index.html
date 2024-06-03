@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -245,9 +246,24 @@
                 timeLeftElement.innerText = timeLeft;
                 if (timeLeft === 0) {
                     clearInterval(timerInterval);
-                    nextQuestion(); // Automatically move to the next question when time runs out
+                    showCorrectAnswerAndNext();
                 }
             }, 1000);
+        }
+
+        function showCorrectAnswerAndNext() {
+            answerButtons.forEach(button => {
+                if (button.dataset.correct === "true") {
+                    button.classList.add("correct");
+                } else {
+                    button.classList.add("wrong");
+                }
+                button.disabled = true;
+            });
+            feedbackElement.innerText = "Time's up! Showing correct answer...";
+            setTimeout(() => {
+                nextQuestion();
+            }, 2000);
         }
 
         function resetState() {
@@ -263,7 +279,9 @@
             clearInterval(timerInterval);
         }
 
-        function selectAnswer(index) {
+        function selectAnswer(index
+
+) {
             const selectedButton = answerButtons[index];
             const correct = selectedButton.dataset.correct === "true";
             if (correct) {
